@@ -30,11 +30,10 @@ pipe = pipeline(
 )
 
 audio_files = os.listdir("audio")
-for audio_file in audio_files:
+for i, audio_file in enumerate(audio_files):
     result = pipe(f"audio/{audio_file}")
     os.makedirs("output/" + audio_file, exist_ok=True)
     os.rename(f"audio/{audio_file}", f"output/{audio_file}/{audio_file}")
-    with open(f"output/{audio_file}/{audio_file}_transcript.txt", "w") as f:
-        f.write(result["text"])
-
-print(result["text"])
+    with open(f"output/{audio_file}/{audio_file}_transcript.txt", "wb") as f:
+        f.write(result["text"].encode("utf-8"))
+    print(f"Transcript for {audio_file} saved to output/{audio_file}/{audio_file}_transcript.txt ({i + 1}/{len(audio_files)})")
