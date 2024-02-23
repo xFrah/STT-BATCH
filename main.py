@@ -29,12 +29,17 @@ pipe = pipeline(
     device=device,
 )
 
-audio_files = os.listdir("audio")
-for audio_file in audio_files:
-    result = pipe(f"audio/{audio_file}")
-    os.makedirs("output/" + audio_file, exist_ok=True)
-    os.rename(f"audio/{audio_file}", f"output/{audio_file}/{audio_file}")
-    with open(f"output/{audio_file}/{audio_file}_transcript.txt", "w") as f:
-        f.write(result["text"])
+file_lines = []
 
-print(result["text"])
+audio_files = os.listdir("audio")
+for i, audio_file in enumerate(audio_files):
+    result = pipe(f"audio/{audio_file}")
+    file_lines.append(audio_file.encode("utf-8") + b":")
+    for l in result["text"].split("."):
+        if len(l) > 0:
+            file_lines.append(l.encode("utf-8").strip() + b".")
+    file_lines.append(b"")
+    print(f"Transcribed {audio_file}, ({i + 1}/{len(audio_files)})")
+
+with open(f"transcript.txt", "wb") as f:
+    f.write(b"\n".join(file_lines))
